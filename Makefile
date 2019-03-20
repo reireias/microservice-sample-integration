@@ -7,6 +7,11 @@ clone:
 	git clone $(USER_REPOSITORY) ./services/microservice-sample-user
 	git clone $(TWEET_RESPOSITORY) ./services/microservice-sample-tweet
 
+pull:
+	cd ./services/microservice-sample-web && git pull
+	cd ./services/microservice-sample-user && git pull
+	cd ./services/microservice-sample-tweet && git pull
+
 build:
 	docker-compose build
 
@@ -15,3 +20,7 @@ up:
 
 down:
 	docker-compose down
+
+seed:
+	docker-compose exec user node /app/scripts/initialize.js
+	docker-compose exec tweet node /app/scripts/initialize.js
