@@ -1,0 +1,61 @@
+---
+version: '3'
+services:
+  web:
+    build:
+      context: ./services/microservice-sample-web
+      dockerfile: Dockerfile
+      args:
+        GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+        GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+    image: microservice_web:1.0
+    ports:
+      - 3000:3000
+    environment:
+      NUXT_HOST: 0.0.0.0
+      USER_SERVICE: http://user:3000
+      TWEET_SERVICE: http://tweet:3000
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+  user:
+    build:
+      context: ./services/microservice-sample-user
+      dockerfile: Dockerfile
+    image: microservice_user:1.0
+    environment:
+      MONGODB_URL: mongodb://user-db:27017/user
+      MONGODB_ADMIN_NAME: root
+      MONGODB_ADMIN_PASS: example
+      WAIT_HOSTS: user-db:27017
+    depends_on:
+      - user-db
+  user-db:
+    image: mongo
+    volumes:
+      - user-db:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+  tweet:
+    build:
+      context: ./services/microservice-sample-tweet
+      dockerfile: Dockerfile
+    image: microservice_tweet:1.0
+    environment:
+      MONGODB_URL: mongodb://tweet-db:27017/user
+      MONGODB_ADMIN_NAME: root
+      MONGODB_ADMIN_PASS: example
+      WAIT_HOSTS: tweet-db:27017
+      USER_SERVICE: http://user:3000
+    depends_on:
+      - tweet-db
+  tweet-db:
+    image: mongo
+    volumes:
+      - tweet-db:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+volumes:
+  user-db:
+  tweet-db:
