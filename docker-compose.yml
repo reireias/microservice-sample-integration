@@ -5,9 +5,6 @@ services:
     build:
       context: ./services/microservice-sample-web
       dockerfile: Dockerfile
-      args:
-        GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
-        GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
     image: microservice_web:1.0
     ports:
       - 3000:3000
