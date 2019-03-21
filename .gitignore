@@ -1,3 +1,4 @@
 services/*
 !services/.gitkeep
 .env
+config/secret-data.yml
