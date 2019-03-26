@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tweet-deployment
+  labels:
+    app: tweet
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tweet
+  template:
+    metadata:
+      labels:
+        app: tweet
+    spec:
+      containers:
+        - name: tweet
+          image: microservice_tweet:1.0
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGODB_URL
+              value: mongodb://tweet-db:27017/tweet
+            - name: WAIT_HOSTS
+              value: tweet-db:27017
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tweet-service
+spec:
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+  selector:
+    app: tweet
+  type: LoadBalancer

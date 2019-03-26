@@ -1,0 +1,61 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-deployment
+  labels:
+    app: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: web
+          image: microservice_web:1.0
+          ports:
+            - containerPort: 3000
+          env:
+            - name: GITHUB_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: github-oauth
+                  key: GITHUB_CLIENT_ID
+            - name: GITHUB_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: github-oauth
+                  key: GITHUB_CLIENT_SECRET
+            - name: CALLBACK_URL
+              value: http://microservice.test/callback
+            - name: BASE_URL
+              value: http://microservice.test
+            - name: NUXT_HOST
+              value: 0.0.0.0
+            - name: USER_SERVICE
+              value: http://user-service:3000
+            - name: TWEET_SERVICE
+              value: http://tweet-service:3000
+      dnsConfig:
+        nameservers:
+          - 8.8.8.8
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-service
+  labels:
+    app: web-service
+spec:
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+  selector:
+    app: web
+  type: NodePort

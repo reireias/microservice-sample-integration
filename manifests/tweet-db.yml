@@ -1,0 +1,63 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tweet-db
+  labels:
+    name: tweet-db
+spec:
+  ports:
+    - port: 27017
+      targetPort: 27017
+  clusterIP: None
+  selector:
+    app: tweet-db
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: tweet-db
+spec:
+  selector:
+    matchLabels:
+      app: tweet-db
+  serviceName: tweet-db
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: tweet-db
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: tweet-db
+          image: mongo
+          command:
+            - mongod
+            - "--bind_ip"
+            - 0.0.0.0
+            - "--replSet"
+            - rs0
+            - "--smallfiles"
+            - "--noprealloc"
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: tweet-db-pvc
+              mountPath: /data/db
+        - name: tweet-db-sidecar
+          image: cvallance/mongo-k8s-sidecar
+          env:
+            - name: MONGO_SIDECAR_POD_LABELS
+              value: "app=tweet-db"
+            - name: KUBERNETES_MONGO_SERVICE_NAME
+              value: tweet-db
+  volumeClaimTemplates:
+    - metadata:
+        name: tweet-db-pvc
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: 100Mi
