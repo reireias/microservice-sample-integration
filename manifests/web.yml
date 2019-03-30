@@ -1,4 +1,17 @@
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-service
+  labels:
+    app: web-service
+spec:
+  ports:
+    - port: 3000
+      targetPort: 3000
+  selector:
+    app: web
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -44,18 +57,3 @@ spec:
       dnsConfig:
         nameservers:
           - 8.8.8.8
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: web-service
-  labels:
-    app: web-service
-spec:
-  ports:
-    - name: http
-      port: 3000
-      targetPort: 3000
-  selector:
-    app: web
-  type: LoadBalancer
