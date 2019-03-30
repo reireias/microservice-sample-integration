@@ -58,4 +58,4 @@ spec:
       targetPort: 3000
   selector:
     app: web
-  type: NodePort
+  type: LoadBalancer

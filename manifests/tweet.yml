@@ -22,7 +22,7 @@ spec:
             - containerPort: 3000
           env:
             - name: MONGODB_URL
-              value: mongodb://tweet-db:27017/tweet
+              value: mongodb://tweet-db:27017/tweet?replicaSet=rs0
             - name: WAIT_HOSTS
               value: tweet-db:27017
 ---
