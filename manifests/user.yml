@@ -1,4 +1,15 @@
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+spec:
+  ports:
+    - port: 3000
+      targetPort: 3000
+  selector:
+    app: user
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -25,16 +36,3 @@ spec:
               value: mongodb://user-db:27017/user?replicaSet=rs0
             - name: WAIT_HOSTS
               value: user-db:27017
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: user-service
-spec:
-  ports:
-    - name: http
-      port: 3000
-      targetPort: 3000
-  selector:
-    app: user
-  type: LoadBalancer
